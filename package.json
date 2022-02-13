@@ -1,0 +1,108 @@
+{
+  "name": "import-version",
+  "displayName": "import-version",
+  "description": "Display import/require package version in the editor",
+  "publisher": "mrrs878<mrrs878@foxmail.com>",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.64.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Import Version configuration",
+      "properties": {
+        "importVersion.lastPackageColor": {
+          "type": "string",
+          "default": "#7cc36e",
+          "description": "Decoration color for last packages"
+        },
+        "importVersion.legacyPackageColor": {
+          "type": "string",
+          "default": "#d44e40",
+          "description": "Decoration color for legacy packages"
+        },
+        "importVersion.typescriptExtensions": {
+          "type": "array",
+          "default": [
+            "\\.tsx?$"
+          ],
+          "description": "File extensions to be parsed by the Typescript parser"
+        },
+        "importVersion.javascriptExtensions": {
+          "type": "array",
+          "default": [
+            "\\.jsx?$"
+          ],
+          "description": "File extensions to be parsed by the Javascript parser"
+        },
+        "importVersion.showCalculatingDecoration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Display the 'calculating' decoration when starting to calculate the version"
+        },
+        "importVersion.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging"
+        },
+        "importVersion.timeout": {
+          "type": "number",
+          "default": 10000,
+          "description": "Version calculation timeout in milliseconds (requires restart)"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "importVersion.toggle",
+        "title": "Toggle import version"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.14.2",
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "14.x",
+    "@types/shelljs": "^0.8.11",
+    "@types/vscode": "^1.64.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vscode/test-electron": "^2.0.3",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "glob": "^7.2.0",
+    "mocha": "^9.1.3",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.17.0",
+    "@babel/traverse": "^7.17.0",
+    "@babel/types": "^7.17.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "find-up": "^6.3.0",
+    "pkg-dir": "5.0.0",
+    "ramda": "^0.28.0",
+    "shelljs": "^0.8.5"
+  }
+}
