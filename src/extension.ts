@@ -2,7 +2,7 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 15:50:22
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-13 23:23:34
+ * @LastEditTime: 2022-02-14 22:17:38
  */
 
 import { EventEmitter } from 'events';
@@ -96,13 +96,13 @@ export function deactivate() {
   // cleanup();
 }
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
   try {
     logger.init(context);
     logger.log('starting...');
 
     initNodePath();
-    checkRegistryStatus();
+    await checkRegistryStatus();
 
     workspace.onDidChangeTextDocument((ev) => isActive && processActiveFile(ev.document));
     window.onDidChangeActiveTextEditor((ev) => ev && isActive && processActiveFile(ev.document));
@@ -120,9 +120,7 @@ export function activate(context: ExtensionContext) {
       }
     }));
   } catch (e) {
-    console.log(e);
-
-    if ((e as any).toStrong) {
+    if ((e as any).toString) {
       window.showInformationMessage((e as any).toString());
     }
     logger.log(`wrapping error: ${e}`);

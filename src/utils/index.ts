@@ -2,13 +2,16 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 14:52:19
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-13 23:22:16
+ * @LastEditTime: 2022-02-14 22:19:50
  */
 
 import * as fs from 'fs';
+import fetch from 'node-fetch';
 import * as path from 'path';
 import { sync as packageDirectorySync } from 'pkg-dir';
 import * as shell from 'shelljs';
+import { window } from 'vscode';
+import AbortController from 'abort-controller';
 
 function parseJson(dir: string) {
   const pkg = path.join(dir, 'package.json');
@@ -99,23 +102,27 @@ function getPackageVersion(pkg: Package) {
   });
 }
 
-function checkRegistryStatus() {
+async function checkRegistryStatus() {
   const { stdout: registry } = shell.exec('npm config get registry');
-  const domain = registry.replace(/http(s?):\/\/|\//ig, '');
-  const pong = shell.exec(`ping ${domain}`, {
-    timeout: 4000,
-    async: true,
-  });
-  let pingMessage = '';
-  pong.stdout?.on('data', (data) => {
-    pingMessage += data;
-  });
-  pong.stdout?.on('end', () => {
-    const isRegistryAvailable = pingMessage?.match(/Request timeout/);
-    if (isRegistryAvailable) {
-      throw new Error(`npm registry(${registry}) is not available`);
+  const controller = new AbortController();
+
+  const timerId = setTimeout(() => {
+    controller.abort();
+  }, 15000);
+
+  try {
+    const res = await fetch(registry, {
+      signal: controller.signal,
+    });
+
+    if (res.ok) {
+      clearTimeout(timerId);
     }
-  });
+  } catch (e) {
+    window.showInformationMessage((`npm registry(${registry}) is not available`));
+  } finally {
+    clearTimeout(timerId);
+  }
 }
 
 function initNodePath() {
