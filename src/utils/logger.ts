@@ -2,7 +2,7 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 16:55:55
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-13 17:02:59
+ * @LastEditTime: 2022-02-17 21:41:05
  */
 
 import {
@@ -31,4 +31,6 @@ class Logger {
   }
 }
 
-export default new Logger();
+const logger = new Logger();
+
+export { logger };

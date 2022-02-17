@@ -2,13 +2,13 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 16:57:14
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-13 21:40:20
+ * @LastEditTime: 2022-02-17 21:41:16
  */
 
 import {
   workspace, window, Range, Position,
 } from 'vscode';
-import logger from './logger';
+import { logger } from './logger';
 
 const decorations: Record<string, any> = {};
 

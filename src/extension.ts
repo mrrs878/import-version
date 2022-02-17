@@ -2,17 +2,21 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 15:50:22
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-14 22:17:38
+ * @LastEditTime: 2022-02-17 21:42:28
  */
 
 import { EventEmitter } from 'events';
 import {
   ExtensionContext, TextDocument, window, workspace, commands,
 } from 'vscode';
+import { innerJoin } from 'ramda';
+import debounce from 'lodash.debounce';
 import { calculated, clearDecorations, flushDecorations } from './utils/decorator';
-import logger from './utils/logger';
-import { checkRegistryStatus, getPackageVersion, initNodePath } from './utils';
+import {
+  logger, checkRegistryStatus, getPackageVersion, initNodePath,
+} from './utils';
 import { filterPackages, getPackages } from './utils/babelParser';
+import { getPackagesFromPackageJSON } from './utils/packageInfo';
 
 let isActive = true;
 
@@ -38,6 +42,7 @@ function importVersion(
   fileName: string,
   text: string,
   documentLanguage: string | undefined,
+  pkgs: Array<string>,
   config = { maxCallTime: Infinity, concurrent: true },
 ) {
   logger.log(config.toString());
@@ -49,8 +54,20 @@ function importVersion(
   const emitter = new EventEmitter();
   setTimeout(async () => {
     try {
-      const imports = getPackages(fileName, text, documentLanguage).filter(filterPackages);
+      const mixedPackages = getPackages(fileName, text, documentLanguage).filter(filterPackages);
+      const imports = innerJoin(
+        (p, name) => {
+          if (p.name.startsWith('@')) {
+            // eslint-disable-next-line no-param-reassign
+            p.name = p.name.split('/').slice(0, 2).join('/');
+          }
+          return p.name === name;
+        },
+        mixedPackages,
+        pkgs,
+      );
       emitter.emit('start', imports);
+
       const promises = imports
         .map((packageInfo: any) => getPackageVersion(packageInfo))
         .map((promise: any) => promise.then((packageInfo: any) => {
@@ -71,6 +88,9 @@ function importVersion(
 async function processActiveFile(document: TextDocument) {
   if (document && language(document)) {
     const { fileName } = document;
+
+    const { pkgs } = getPackagesFromPackageJSON(fileName);
+
     if (emitters[fileName]) {
       emitters[fileName].removeAllListeners();
     }
@@ -79,6 +99,7 @@ async function processActiveFile(document: TextDocument) {
       fileName,
       document.getText(),
       language(document),
+      pkgs,
       { concurrent: true, maxCallTime: timeout },
     );
     if (!emitter) {
@@ -104,8 +125,14 @@ export async function activate(context: ExtensionContext) {
     initNodePath();
     await checkRegistryStatus();
 
-    workspace.onDidChangeTextDocument((ev) => isActive && processActiveFile(ev.document));
-    window.onDidChangeActiveTextEditor((ev) => ev && isActive && processActiveFile(ev.document));
+    workspace.onDidChangeTextDocument(debounce(
+      (ev) => isActive && processActiveFile(ev.document),
+      500,
+    ));
+    window.onDidChangeActiveTextEditor(debounce(
+      (ev) => ev && isActive && processActiveFile(ev.document),
+      500,
+    ));
     if (window.activeTextEditor && isActive) {
       processActiveFile(window.activeTextEditor.document);
     }
