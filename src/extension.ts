@@ -2,7 +2,7 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 15:50:22
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-17 21:42:28
+ * @LastEditTime: 2022-02-17 21:46:22
  */
 
 import { EventEmitter } from 'events';
@@ -11,12 +11,11 @@ import {
 } from 'vscode';
 import { innerJoin } from 'ramda';
 import debounce from 'lodash.debounce';
-import { calculated, clearDecorations, flushDecorations } from './utils/decorator';
 import {
+  calculated, clearDecorations, flushDecorations,
   logger, checkRegistryStatus, getPackageVersion, initNodePath,
+  filterPackages, getPackages, getPackagesFromPackageJSON,
 } from './utils';
-import { filterPackages, getPackages } from './utils/babelParser';
-import { getPackagesFromPackageJSON } from './utils/packageInfo';
 
 let isActive = true;
 

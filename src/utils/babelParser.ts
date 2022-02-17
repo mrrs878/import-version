@@ -2,7 +2,7 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 17:36:22
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-13 23:07:06
+ * @LastEditTime: 2022-02-17 21:45:50
  */
 
 import traverse from '@babel/traverse';
@@ -14,7 +14,7 @@ import {
   isTemplateLiteral,
 } from '@babel/types';
 import { parse as jsParse, ParserPlugin } from '@babel/parser';
-import { isBuiltInModule } from '.';
+import { isBuiltInModule } from './packageVersion';
 
 type BabelNode = any;
 
