@@ -2,16 +2,13 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-17 21:37:04
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-17 21:37:04
+ * @LastEditTime: 2022-02-17 22:33:38
  */
 
 import * as fs from 'fs';
-import fetch from 'node-fetch';
 import * as path from 'path';
 import { sync as packageDirectorySync } from 'pkg-dir';
 import * as shell from 'shelljs';
-import { window } from 'vscode';
-import AbortController from 'abort-controller';
 
 function parseJson(dir: string) {
   const pkg = path.join(dir, 'package.json');
@@ -115,29 +112,6 @@ async function getPackageVersion(pkg: Package) {
   });
 }
 
-async function checkRegistryStatus() {
-  const { stdout: registry } = shell.exec('npm config get registry');
-  const controller = new AbortController();
-
-  const timerId = setTimeout(() => {
-    controller.abort();
-  }, 15000);
-
-  try {
-    const res = await fetch(registry, {
-      signal: controller.signal,
-    });
-
-    if (res.ok) {
-      clearTimeout(timerId);
-    }
-  } catch (e) {
-    window.showInformationMessage((`npm registry(${registry}) is not available`));
-  } finally {
-    clearTimeout(timerId);
-  }
-}
-
 function initNodePath() {
   if (shell.which('node')?.toString()) {
     shell.config.execPath = shell.which('node')?.toString() || '';
@@ -159,7 +133,6 @@ export {
   getPackageVersion,
   parseJson,
   compareVersion,
-  checkRegistryStatus,
   initNodePath,
   isBuiltInModule,
 };

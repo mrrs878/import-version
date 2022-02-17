@@ -2,7 +2,7 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-12 15:50:22
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-17 21:46:22
+ * @LastEditTime: 2022-02-17 23:18:59
  */
 
 import { EventEmitter } from 'events';
@@ -14,7 +14,8 @@ import debounce from 'lodash.debounce';
 import {
   calculated, clearDecorations, flushDecorations,
   logger, checkRegistryStatus, getPackageVersion, initNodePath,
-  filterPackages, getPackages, getPackagesFromPackageJSON,
+  filterPackages, getPackages, getPackagesFromPackageJSON, getRegistryStatus,
+  checkRegistryStatusRetry,
 } from './utils';
 
 let isActive = true;
@@ -85,7 +86,7 @@ function importVersion(
 }
 
 async function processActiveFile(document: TextDocument) {
-  if (document && language(document)) {
+  if (document && language(document) && getRegistryStatus()) {
     const { fileName } = document;
 
     const { pkgs } = getPackagesFromPackageJSON(fileName);
@@ -114,6 +115,7 @@ async function processActiveFile(document: TextDocument) {
 
 export function deactivate() {
   // cleanup();
+  clearDecorations();
 }
 
 export async function activate(context: ExtensionContext) {
@@ -142,13 +144,16 @@ export async function activate(context: ExtensionContext) {
         processActiveFile(window.activeTextEditor.document);
       } else {
         deactivate();
-        clearDecorations();
       }
     }));
   } catch (e) {
     if ((e as any).toString) {
       window.showInformationMessage((e as any).toString());
     }
+    if (!getRegistryStatus()) {
+      checkRegistryStatusRetry();
+    }
+    clearDecorations();
     logger.log(`wrapping error: ${e}`);
   }
 }
