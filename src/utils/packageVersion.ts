@@ -2,12 +2,12 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-17 21:37:04
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-17 22:33:38
+ * @LastEditTime: 2022-02-19 15:56:28
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { sync as packageDirectorySync } from 'pkg-dir';
+import { packageDirectorySync } from 'pkg-dir';
 import * as shell from 'shelljs';
 
 function parseJson(dir: string) {
@@ -34,7 +34,7 @@ function getPackageModuleContainer(pkg: any) {
   const pkgName = getPackageName(pkg);
 
   while (!foundDir) {
-    const projectDir = packageDirectorySync(currentDir);
+    const projectDir = packageDirectorySync({ cwd: currentDir });
     if (!projectDir) {
       throw new Error(`Package directory not found [${pkg.name}]`);
     }

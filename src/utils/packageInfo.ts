@@ -2,10 +2,10 @@
  * @Author: mrrs878@foxmail.com
  * @Date: 2022-02-15 22:03:12
  * @LastEditors: mrrs878@foxmail.com
- * @LastEditTime: 2022-02-17 21:39:10
+ * @LastEditTime: 2022-02-19 16:41:06
  */
 
-import { sync as packageDirectorySync } from 'pkg-dir';
+import { packageDirectorySync } from 'pkg-dir';
 import { parseJson } from './packageVersion';
 
 /**
@@ -14,7 +14,7 @@ import { parseJson } from './packageVersion';
  * @return {{ pkgs: Array<string>, pkgDir: string }}
  */
 function getPackagesFromPackageJSON(fileName: string) {
-  const pkgDir = packageDirectorySync(fileName);
+  const pkgDir = packageDirectorySync({ cwd: fileName });
   if (!pkgDir) {
     throw new Error('No package.json');
   }
